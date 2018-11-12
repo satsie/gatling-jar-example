@@ -1,4 +1,4 @@
-Sample project for bundling up Gatling tests into an executable jar. This builds on the Gatling Maven plugin and allows the user to use Maven to bring in dependencies, but run the tests without Maven.
+Sample project for bundling up Gatling tests into an executable jar. This builds on the Gatling Maven plugin and allows the user to use Maven to bring in dependencies, but run the tests without Maven. The most interesting file here is going to be the pom.
 
 Based on 
 
