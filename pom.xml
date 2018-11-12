@@ -1,0 +1,102 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.waleyko</groupId>
+  <artifactId>gatling-jar-example</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>gatling-jar-example</name>
+  <url>http://maven.apache.org</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.gatling.highcharts</groupId>
+      <artifactId>gatling-charts-highcharts</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+        <!-- Gatling Maven plugin. This gives Maven the ability to run simulations. -->
+        <plugin>
+            <groupId>io.gatling</groupId>
+            <artifactId>gatling-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <configFolder>src/main/resources</configFolder>
+                <resultsFolder>target/gatling/results</resultsFolder>
+                <simulationsFolder>src/main/scala/gatling</simulationsFolder>
+            </configuration>
+        </plugin>
+
+        <!-- Take care of all the scala stuff. Without this plugin, Scala related dependencies need to be explicitly declared. -->
+        <plugin>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>scala-maven-plugin</artifactId>
+            <version>3.4.4</version>
+            <!-- Tell the scala plugin to compile the Gatling simulations. By default it looks for the Scala files in src/main/scala -->
+            <executions>
+                <execution>
+                    <id>scala-compile-first</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>add-source</goal>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- The uber jar -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.1</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>io.gatling.app.Gatling</mainClass>
+                            </transformer>
+                        </transformers>
+                        <!-- Exclude manifest signature files. 
+                            https://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar 
+                        -->
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
+                                </excludes>
+                            </filter>
+                        </filters>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+
+    <!-- Add the run script to the artifact. logback.xml can also be added here. -->
+    <resources>
+        <resource>
+            <filtering>true</filtering>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <targetPath>${project.build.directory}</targetPath>
+            <includes>
+                <include>run.sh</include>
+            </includes>
+        </resource>
+    </resources>
+  </build>
+
+
+
+</project>
